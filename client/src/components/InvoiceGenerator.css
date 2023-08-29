@@ -1,0 +1,200 @@
+/* styles.css */
+body{
+  background-color: #cecece;
+  font-family:'Courier New', Courier, monospace;
+}
+.main-container {
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 660px;
+}
+
+.invoice-heading {
+  font-size: 24px;
+}
+
+.invoice-subheading {
+  font-size: small;
+  font-weight:lighter ;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.form-label {
+  display: block;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.input-field {
+  width:100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.logout-button {
+  
+  color: #767676;
+  cursor: pointer;
+  position: relative;
+  left: 270px;
+  font-size: small;
+}
+.entry-button {
+
+  color: #767676;
+cursor: pointer;
+position: relative;
+left: 280px;
+font-size: small;
+}
+
+.payment-type-container {
+  margin-top: 10px;
+}
+
+.additional-field-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.generate-pdf-button {
+  background-color: #000000;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* Add more styling rules as needed */
+
+.button-container{
+  display: flex;
+  flex-direction: row;
+}
+
+.line{
+  position: relative;
+  left: 275px;
+  bottom: 17px;
+}
+
+.gap-btw{
+
+
+}
+
+.bill{
+  margin: 0;
+  color: #990000;
+}
+
+.top-heading{
+  position: relative;
+  right: 105px;
+  bottom: 25px;
+}
+.header-menu{
+  display: flex;
+  width: 18%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header{
+  display: flex;
+  flex-direction: row;
+  
+  justify-content: space-between;
+
+
+}
+
+.links{
+  font-size: 12px;
+  cursor: pointer;
+}
+.branding {
+  font-size: 18px;
+  margin: 0;
+  text-transform: uppercase;
+  
+}
+
+.center-container {
+  display: flex;
+  justify-content: center; /* Horizontally centers content */
+  align-items: center; /* Vertically centers content (optional) */
+  margin: 0;
+}
+
+.title{
+  font-size: 20px;
+  color: #515151;
+  left: 50%;
+
+}
+
+.radio-container{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: center;
+  
+
+}
+
+.radio-container label{
+  display: flex;
+  align-items: center;
+  margin-right: 50px;
+}
+
+.radio-container input[type="radio"]{
+  margin: 10px;
+
+}
+
+.fixed-height{
+  height: 40px;
+  /* margin-top: 10px; */
+}
+.hidden-label{
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.date-input-field {
+  width:300px;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.radio-input-field {
+  width:300px;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

@@ -1,0 +1,158 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+body{
+  background-color: #bbeeff;
+}
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+
+/* styles.css */
+
+/* Styles for the main container */
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  
+}
+
+/* Styles for the login form */
+.login-form {
+  max-width: 400px;
+  padding-left: 20px;
+  padding-right: 40px;
+  padding-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  margin-right: 10px;
+}
+
+.login-heading {
+  margin-bottom: 20px;
+}
+
+/* Common styles for form elements */
+.form-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  
+}
+
+/* Styles for login button */
+.login-button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+}
+
+/* Styles for error messages */
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
+
+/* Styles for the invoice generator container */
+.container {
+  max-width: 600px;
+  padding: 20px 40px 20px 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.logout-button {
+  padding: 10px 15px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  float: right;
+}
+
+.invoice-heading {
+  margin-bottom: 20px;
+}
+
+.invoice-subheading {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Styles for the payment type container */
+.payment-type-container {
+  margin-bottom: 15px;
+}
+
+/* Styles for the additional field container */
+.additional-field-container {
+  margin-bottom: 15px;
+}
+
+/* Styles for the generate PDF button */
+.generate-pdf-button {
+  padding: 10px 15px;
+  background-color: #000000;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
