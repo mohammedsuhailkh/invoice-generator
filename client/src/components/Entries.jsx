@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import jsPDF from 'jspdf';
-import iconImage from "../assets/logo.png";
-import signature from "../assets/sign.png";
-import numWords from 'num-words';
-import './Entries.css';
-import calibri from '../../public/Calibri Light.ttf';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import numWords from "num-words";
+import "./Entries.css";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import html2pdf from "html2pdf.js";
+import PDFContent from "./PdfContent";
+import ReactDOM from "react-dom";
+
 
 function Entries() {
   const [entries, setEntries] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [matchedEntries, setMatchedEntries] = useState([]);
-  const [selectedEntry, setSelectedEntry] = useState(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     const fetchEntries = async () => {
@@ -23,22 +23,19 @@ function Entries() {
         const data = await response.json();
         setEntries(data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchEntries();
   }, [searchTerm]);
 
-  const currentDate = new Date();
-  const numericDate = currentDate.toLocaleDateString("en-US");
-
   const handleSearch = () => {
-    if (searchTerm === '') {
+    if (searchTerm === "") {
       setMatchedEntries([]);
     } else {
       const matches = entries.filter(
-        entry =>
+        (entry) =>
           entry.billNo.toString() === searchTerm ||
           entry.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -46,81 +43,61 @@ function Entries() {
     }
   };
 
-  const convertAmountToWords = amount => {
+  const convertAmountToWords = (amount) => {
     const numericAmount = parseFloat(amount);
     if (!isNaN(numericAmount)) {
       return numWords(numericAmount).toUpperCase();
     }
-    return '';
+    return "";
   };
 
-  const generatePDF = (entry) => {
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'mm',
-      format: 'a5',
-    });
+  const currentDate = new Date();
+  const numericDate = currentDate.toLocaleDateString("en-US"); 
+
+  const generatePDF = async (personData) => {
+    const container = document.createElement("div");
+    // document.body.appendChild(container); // Append the container to the body
   
-    doc.addImage(iconImage, 'PNG', 10, 10, 20, 20);
-    doc.addFont(calibri, 'calibri', 'normal');
+    const { billNo, name, amount, payment_type, additional_field, dd_date, cheque_date } = personData;
   
-    doc.setFont("Times", "bold");
-    doc.setFontSize(14);
-  
-    doc.text("CASH RECEIPT", 80, 30);
-    doc.text("S R LAKSHADWEEP TOURS & TRAVELS", 48, 40);
-  
-    doc.setFont('calibri', 'normal');
-    doc.setFontSize(14);
-  
-    doc.text(
-      'EX-TK Building, Marar Road, Kinship Building Willingdon Island, Kochi 682003',
-      25,
-      45
+    ReactDOM.render(
+      <PDFContent
+        billNo={billNo}
+        name={name}
+        amount={amount}
+        selectedPaymentType={payment_type}
+        additionalFieldText={additional_field}
+        numericDate={numericDate}
+        convertAmountToWords={convertAmountToWords}
+      />,
+      container
     );
   
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(12);
+    const options = {
+      margin: 0,
+      filename: `Invoice${name}${billNo}`,
+      image: { type: "jpeg", quality: 1 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "mm", format: "a5", orientation: "landscape" },
+    };
   
-    doc.setFont("Times");
-    doc.setFontSize(12);
-    doc.text(`Date: ${numericDate}`, 170, 60);
+    // Generate the PDF from the container
+    await html2pdf().from(container).set(options).save();
   
-    doc.text(`Invoice No: ${entry.billNo}`, 10, 60);
-    doc.text(`Received with thanks from      ${entry.name}`, 10, 80);
-    doc.text(`the sum of Rs   ${entry.amount}    (Rupees)`, 10, 90);
-    doc.text(`${convertAmountToWords(entry.amount)}`, 70, 90);
-    doc.text(`only By ${entry.payment_type} NO: ${entry.additional_field}`, 10, 100);
-    doc.text(`Dated  ${numericDate}  being the advance Fee`, 10, 110);
-    doc.text(`Rs : ${entry.amount}  `, 10, 120);
-    doc.text(`Managing Director `, 170, 140);
-    doc.addImage(signature, 'PNG', 170, 120, 30, 20);
-  
-    // Use a unique name for the PDF file
-    const fileName = `invoice_${entry.id}.pdf`;
-  
-    // Save the PDF
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const a = document.createElement("a");
-    a.href = pdfUrl;
-    a.download = fileName;
-    a.click();
-  
-    setSelectedEntry(null); // Reset selected entry
+    // Remove the container from the body
+    document.body.removeChild(container);
   };
-  
   
 
   return (
     <div className="entries-container">
       <Link to="/invoiceGenerator" className="back-button">
-        <ArrowBackIcon/>
+        <ArrowBackIcon />
       </Link>
       <h1>Search Cash Receipts</h1>
       <div className="search-bar">
         <input
-          className='input-field'
+          className="input-field"
           type="text"
           placeholder="Enter key"
           value={searchTerm}
@@ -130,17 +107,15 @@ function Entries() {
           Search
         </button>
       </div>
-     
       <div className="table-container">
         <table>
           <tbody>
             {matchedEntries.length === 0 ? (
-              <tr>
-                {/* Placeholder for no matching entries */}
-              </tr>
+              <tr>{/* Placeholder for no matching entries */}</tr>
             ) : (
-              matchedEntries.map(entry => (
+              matchedEntries.map((entry) => (
                 <tr key={entry.id}>
+                  <td>{entry.id}</td>
                   <td>{entry.billNo}</td>
                   <td>{entry.name}</td>
                   <td>Rs/ {entry.amount}</td>
@@ -172,6 +147,7 @@ function Entries() {
           </tbody>
         </table>
       </div>
+      <div ref={containerRef} style={{ display: "none" }}></div>
     </div>
   );
 }

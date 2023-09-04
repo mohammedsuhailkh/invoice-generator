@@ -95,7 +95,8 @@ font-size: small;
 }
 
 .gap-btw{
-
+display: flex;
+justify-content: space-between;
 
 }
 

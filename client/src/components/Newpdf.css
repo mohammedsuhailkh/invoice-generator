@@ -1,0 +1,92 @@
+@font-face {
+    font-family: 'Calibri Light';
+    src: url('../../public/Calibri Light.ttf') format('truetype');
+    /* You can specify additional properties like font-weight and font-style if needed */
+  }
+.mainpdf{
+    background-color: #ffffff;
+    margin: 20px;
+    padding: 20px;
+}
+.pdf-centered-div {
+    width: 100%;
+    text-align: center;
+   
+  }
+  
+.pdf-centered-container {
+    /* Center horizontally */
+   
+    text-align: center;
+   
+    /* Center vertically */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Adjust as needed */
+    font-family: 'Times New Roman' ;    
+  }
+  
+.pdf-container {
+    width: 180mm; /* Width of A5 paper in landscape */
+  height: 110mm; 
+ 
+  }
+  
+.pdf-header {
+    text-align: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    line-height: 10px;
+    padding: 0;
+}
+.pdf-address {
+    text-align: center;
+    margin-top: 0;
+    font-family: 'Calibri Light', sans-serif;
+    font-weight: normal;
+}
+.pdf-mainhead{
+    margin-bottom: 0;
+    font-size: larger;
+}
+.pdf-details {
+    margin-top: 20px;
+    line-height: 30px;
+}
+.pdf-amount {
+    margin-top: 20px;
+}
+.pdf-signature {
+    margin-top: 40px;
+    text-align: right;
+}
+
+.pdf-topDate{
+    display: flex;
+    justify-content: space-between;
+}
+
+.pdf-billno{
+    color: #990000;
+    font-size: larger;
+}
+
+.pdf-amountB{
+    font-size: larger;
+}
+.pdf-icon {
+    height: 50px;
+    width: 50px;
+    align-self: flex-start;
+  }
+
+
+.pdf-sign{
+    height: 70px;
+    width: 70px;
+    position: relative;
+    bottom: 90px;
+}

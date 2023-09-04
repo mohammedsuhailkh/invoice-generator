@@ -73,7 +73,22 @@ app.get('/api/fetch-entries', (req, res) => {
 
 
 
+  app.get('/api/fetch-last-billNo', (req, res) => {
+    const query = 'SELECT MAX(billNo) AS lastBillNo FROM invoices';
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error('Database query error:', err);
+        res.sendStatus(500);
+        return;
+      }
+      // Extract the lastBillNo from the query result
+      const lastBillNo = results[0].lastBillNo || 0; // Default to 0 if no results
+      res.json({ lastBillNo });
+    });
+  });
 
+  
+  
 
 
 

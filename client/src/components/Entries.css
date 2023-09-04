@@ -5,6 +5,8 @@ body{
 }
 h1{
   margin: 0;
+  font-size: 20PX;
+  padding-bottom: 20px;
 }
 
 .entries-container {
