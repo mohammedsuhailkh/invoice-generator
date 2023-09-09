@@ -31,15 +31,16 @@ function LoginForm() {
 
   return (
     <form className="login-form" onSubmit={handleLogin}>
+      <h1>LOGIN</h1>
       <input
-        className="input-field"
+        className="login-input-field"
         type="text"
         placeholder="Username"
         value={username}
         onChange={event => setUsername(event.target.value)}
       />
       <input
-        className="input-field"
+        className="login-input-field"
         type="password"
         placeholder="Password"
         value={password}

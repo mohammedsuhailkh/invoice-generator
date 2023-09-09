@@ -1,3 +1,8 @@
+
+
+
+
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -44,49 +49,71 @@ app.post('/api/login', (req, res) => {
 });
 
 
-app.get('/api/fetch-entries', (req, res) => {
-    const query = 'SELECT * FROM invoices';
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error('Database query error:', err);
-        res.sendStatus(500);
-        return;
-      }
-      res.json(results);
-    });
-  });
 
-  app.post('/api/save-data', (req, res) => {
-    const { billNo, name, amount, paymentType, additionalFieldText, chequeDate, ddDate } = req.body;
-  
-    const query = 'INSERT INTO invoices (name, amount, payment_type, additional_field, billNo, cheque_date, dd_date) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    db.query(query, [name, amount, paymentType, additionalFieldText, billNo, chequeDate, ddDate], (err, results) => {
-      if (err) {
-        console.error('Database query error:', err);
-        res.sendStatus(500);
-        return;
-      }
-      res.sendStatus(200); // Successful insertion
-    });
+app.get('/api/fetch-entries', (req, res) => {
+  const query = 'SELECT * FROM invoices';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Database query error:', err);
+      res.sendStatus(500);
+      return;
+    }
+    res.json(results);
   });
-  
+});
+
+app.post('/api/save-data', (req, res) => {
+const { billNo, name, amount, paymentType, additionalFieldText, chequeDate, ddDate, convertAmountToWords } = req.body;
+
+const query = 'INSERT INTO invoices (name, amount, payment_type, additional_field, billNo, cheque_date, dd_date, amount_to_words) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+db.query(
+  query,
+  [name, amount, paymentType, additionalFieldText, billNo, chequeDate, ddDate, convertAmountToWords], // Ensure the order matches the query
+  (err, results) => {
+    if (err) {
+      console.error('Database query error:', err);
+      res.sendStatus(500);
+      return;
+    }
+    res.sendStatus(200); // Successful insertion
+  }
+);
+});
+
+
+
 
 
 
   app.get('/api/fetch-last-billNo', (req, res) => {
-    const query = 'SELECT MAX(billNo) AS lastBillNo FROM invoices';
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error('Database query error:', err);
-        res.sendStatus(500);
-        return;
-      }
-      // Extract the lastBillNo from the query result
-      const lastBillNo = results[0].lastBillNo || 0; // Default to 0 if no results
-      res.json({ lastBillNo });
+      const query = 'SELECT billNo FROM invoices WHERE id = (SELECT MAX(id) FROM invoices)';
+      db.query(query, (err, results) => {
+        if (err) {
+          console.error('Database query error:', err);
+          res.sendStatus(500);
+          return;
+        }
+    
+        if (results.length === 0) {
+          // If there are no entries, create an entry with billNo 1001
+          const initialBillNo = 1001;
+          const initialEntryQuery = 'INSERT INTO invoices (billNo) VALUES (?)';
+          db.query(initialEntryQuery, [initialBillNo], (err, insertResult) => {
+            if (err) {
+              console.error('Error creating initial entry:', err);
+              res.sendStatus(500);
+              return;
+            }
+            res.json({ lastBillNo: initialBillNo });
+          });
+        } else {
+          // Extract the lastBillNo from the query result
+          const lastBillNo = results[0].billNo || 0;
+          res.json({ lastBillNo });
+        }
+      });
     });
-  });
-
+    
   
   
 

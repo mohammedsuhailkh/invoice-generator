@@ -1,16 +1,9 @@
 import html2pdf from 'html2pdf.js';
 import './Newpdf.css';
 import PDFContent from './PdfContent';
-import numWords from 'num-words';
 import ReactDOMServer from 'react-dom/server'; // Import ReactDOMServer
 
-const convertAmountToWords = (amount) => {
-  const numericAmount = parseFloat(amount);
-  if (!isNaN(numericAmount)) {
-    return numWords(numericAmount).toUpperCase();
-  }
-  return "";
-};
+
 
 export const generatePDF = ({
   billNo,
@@ -18,9 +11,18 @@ export const generatePDF = ({
   amount,
   selectedPaymentType,
   additionalFieldText,
-  numericDate
+  convertAmountToWords,
+  numericDate,
+  chequeDate,
+  ddDate
 }) => {
   console.log("Received input values:", billNo, name, amount, selectedPaymentType, additionalFieldText, numericDate);
+
+  const dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+
+  const chequeDateFormatted = chequeDate ? new Date(chequeDate).toLocaleString("en-US", dateOptions) : "N/A";
+  const ddDateFormatted = ddDate ? new Date(ddDate).toLocaleString("en-US", dateOptions) : "N/A";
+
 
   const pdfContent = (
     <PDFContent
@@ -31,6 +33,8 @@ export const generatePDF = ({
       additionalFieldText={additionalFieldText}
       numericDate={numericDate}
       convertAmountToWords={convertAmountToWords}
+      chequeDate ={chequeDateFormatted}
+      ddDate={ddDateFormatted}
     />
   );
 
@@ -45,9 +49,9 @@ export const generatePDF = ({
   // Configuration for html2pdf
   const options = {
     margin: 0,
-    filename: `Invoice${name}${billNo}`,
+    filename: `Invoice${billNo}`,
     image: { type: 'jpeg', quality: 1 },
-    html2canvas: { scale: 2 },
+    html2canvas: { scale: 5 },
     jsPDF: { unit: 'mm', format: 'a5', orientation: 'landscape' },
   };
 

@@ -7,22 +7,18 @@ const containerStyle = {
   margin: '10px',
 };
 
-const convertAmountToWords = (amount) => {
-  const numericAmount = parseFloat(amount);
-  if (!isNaN(numericAmount)) {
-    return numWords(numericAmount).toUpperCase();
-  }
-  return "";
-};
+
 
 const PDFContent = ({
   billNo,
   name,
   amount,
   selectedPaymentType,
-  additionalFieldText,
+  additionalFieldText ,
   numericDate,
   convertAmountToWords,
+  ddDate,
+  chequeDate,
 }) => {
   // Convert the 'name' to uppercase
   const uppercaseName = name.toUpperCase();
@@ -57,7 +53,13 @@ const PDFContent = ({
               <p>Date: {numericDate}</p>
             </div>
             {/* Use 'uppercaseName' instead of 'name' */}
-            <p>Received with thanks from <b>{uppercaseName}</b> the sum of Rs <b>{amount}</b> (Rupees <b>{convertAmountToWords(amount)} </b>) only By {selectedPaymentType} <b>{additionalFieldText} </b>Dated {numericDate} being the advance Fee <br /><br /> Rs: <b className='pdf-amountB'>{amount}</b></p>
+            <p>
+                  Received with thanks from <b>{uppercaseName}</b> the sum of Rs <b>{amount}</b> (Rupees <b>{convertAmountToWords}</b>) only {" "}
+                  {selectedPaymentType === 'cheque' ? 'By Cheque No ' : selectedPaymentType === 'dd' ? 'By DD Number ' : selectedPaymentType === 'cash' ? ' in Cash ' : " "}
+                  {selectedPaymentType !== 'cash' ? <><b>{additionalFieldText}</b> {selectedPaymentType === 'cash' ? ' ' : 'Dated '} <b>{selectedPaymentType === 'cheque' ? chequeDate : selectedPaymentType === 'dd' ? ddDate : ''}</b></> : ''}
+                  {" "}being the advance Fee
+                  <br /><br /> Rs: <b className='pdf-amountB'>{amount}</b>
+            </p>
           </div>
           <div className="pdf-signature">
             <p>Managing Director</p>

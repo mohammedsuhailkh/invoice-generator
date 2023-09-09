@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import "./InvoiceGenerator.css";
 import { generatePDF } from "./Newpdf.jsx";
 
+
+
 const InvoiceGenerator = () => {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
@@ -12,26 +14,39 @@ const InvoiceGenerator = () => {
   const [additionalFieldText, setAdditionalFieldText] = useState("");
   const [chequeDate, setChequeDate] = useState("");
   const [ddDate, setDdDate] = useState("");
-  const [billNo, setBillNo] = useState(1000);
+  const [billNo, setBillNo] = useState();
+  const threshHold = 9999;
+  const billStart = 1000;
 
   const navigate = useNavigate();
 
+ 
+
   useEffect(() => {
-    // Fetch the last billNo from the database and set it as the initial value
     fetchLastBillNoFromDatabase()
       .then((lastBillNo) => {
-        // Set the last billNo + 1000 as the initial billNo
-        setBillNo( ( lastBillNo + 1));
+        console.log(lastBillNo);
+        if(lastBillNo <= 0 || lastBillNo >= threshHold){
+          setBillNo(billStart)
+          return
+        }
+       
+        setBillNo(lastBillNo + 1); 
       })
       .catch((error) => {
         console.error("Error fetching last billNo:", error);
       });
   }, []);
 
+  
+
+
+
   const fetchLastBillNoFromDatabase = async () => {
     try {
       const response = await fetch("http://localhost:3001/api/fetch-last-billNo");
       if (response.ok) {
+        console.log('db res');
         const data = await response.json();
         return data.lastBillNo;
       } else {
@@ -44,63 +59,61 @@ const InvoiceGenerator = () => {
     }
   };
 
+  
+ 
+
   const handlePaymentTypeChange = (event) => {
     const value = event.target.value;
     setSelectedPaymentType(value === selectedPaymentType ? null : value);
-  
+
     setChequeDate("");
     setDdDate("");
-    
+
     setShowAdditionalField(value === "cheque" || value === "dd");
   };
-  
 
   const handleAdditionalFieldChange = (event) => {
-    setAdditionalFieldText(event.target.value);
+    const inputValue = event.target.value.substring(0, 10);
+    setAdditionalFieldText(inputValue);
   };
 
-  const convertAmountToWords = (amount) => {
-    const numericAmount = parseFloat(amount);
-    if (!isNaN(numericAmount)) {
-      return numWords(numericAmount).toUpperCase();
-    }
-    return "";
-  };
+  
 
+  
   const currentDate = new Date();
   const numericDate = currentDate.toLocaleDateString("en-US");
 
-
-  const updateBillNo = (newBillNo) => {
-    if (newBillNo >= 1000 && newBillNo <= 9999) {
-      setBillNo(newBillNo);
-    } else if (newBillNo >= 9999) {
-      setBillNo(1000);
-    }
-  };
-
-
-
-
-
   const saveData = async () => {
     try {
+    
+      const [integerPart, decimalPart] = amount.split('.');
+      const integerWords = numWords(parseInt(integerPart, 10)).toUpperCase();
+      const decimalWords = decimalPart
+        ? numWords(parseInt(decimalPart, 10)).toUpperCase()
+        : "ZERO";
+  
+      const amountInWords = `${integerWords} RUPEES AND ${decimalWords} PAISE ONLY`;
+  
+      // Create a data object to send to the server
+      const dataToSend = {
+        name,
+        amount,
+        paymentType: selectedPaymentType,
+        additionalFieldText,
+        billNo,
+        chequeDate: chequeDate || null,
+        ddDate: ddDate || null,
+        convertAmountToWords: amountInWords, // Add the amount in words
+      };
+  
+      // Send a POST request to your server with the data
       const response = await fetch("http://localhost:3001/api/save-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          amount,
-          paymentType: selectedPaymentType,
-          additionalFieldText,
-          billNo,
-          chequeDate: chequeDate || null,
-          ddDate: ddDate || null,
-        }),
+        body: JSON.stringify(dataToSend),
       });
-
+  
       if (response.ok) {
-        
         console.log("Data saved successfully");
       } else {
         console.error("Data could not be saved:", response.statusText);
@@ -109,6 +122,7 @@ const InvoiceGenerator = () => {
       console.error("Error saving data:", error);
     }
   };
+  
 
   const handleLogout = () => {
     navigate("/");
@@ -119,15 +133,32 @@ const InvoiceGenerator = () => {
   };
 
 
+
+ 
+
   const handleDownloadPDF = async () => {
     try {
-      // Fetch the latest billNo from the database before generating the PDF
-      const latestBillNo = await fetchLastBillNoFromDatabase();
-      
-      if (!name || !amount || !selectedPaymentType) {
-        alert("Please fill in all required fields.");
+
+
+      const amountRegex = /^\d+(\.\d{1,2})?$/;
+      if (!name ) {
+        alert("Please fill in name.");
         return;
       }
+      if (!amount ) {
+        alert("Please add amount.");
+        return;
+      }
+      if (!selectedPaymentType) {
+        alert(`Please select payment feild.`);
+        return;
+      }
+
+      if (!amount.match(amountRegex)) {
+        alert("invalid amount.");
+        return;
+      }
+
 
       if (selectedPaymentType === "cheque" && !chequeDate) {
         alert("Please enter a valid Cheque Date.");
@@ -149,9 +180,17 @@ const InvoiceGenerator = () => {
         return;
       }
 
+      const [integerPart, decimalPart] = amount.split('.');
+      const integerWords = numWords(parseInt(integerPart, 10)).toUpperCase();
+      const decimalWords = decimalPart
+        ? numWords(parseInt(decimalPart, 10)).toUpperCase()
+        : "ZERO";
+
+      const amountInWords = `${integerWords} RUPEES AND ${decimalWords} PAISE ONLY`;
 
 
-      // Use the latest billNo to generate the PDF
+
+ 
       generatePDF({
         billNo,
         name,
@@ -159,41 +198,41 @@ const InvoiceGenerator = () => {
         selectedPaymentType,
         additionalFieldText,
         numericDate,
-        convertAmountToWords,
+        convertAmountToWords: amountInWords,
+        chequeDate,
+        ddDate,     
       });
 
-      // Save the data with the latest billNo
       await saveData();
 
-      updateBillNo(billNo + 1);
+    
+      setTimeout(function () {
+        // Reload the current page
+        location.reload();
+      }, 1000); 
 
-      // Set the new billNo
-      // setBillNo(billNo + 1);
+      setTimeout();
+    
 
-      // Clear the form fields
+
+   // Clear the form fields
       setAmount("");
       setName("");
-      setSelectedPaymentType(false); 
+      setSelectedPaymentType(false);
       setAdditionalFieldText("");
-      setShowAdditionalField('');
+      setShowAdditionalField("");
       setChequeDate("");
       setDdDate("");
-
 
       // uncheck the radio buttons
       const radioButtons = document.querySelectorAll('input[type="radio"]');
       radioButtons.forEach((radioButton) => {
         radioButton.checked = false;
       });
-
-  
     } catch (error) {
       console.error("Error generating PDF:", error);
     }
   };
-
-  
-
 
   return (
     <div className="main-container">
@@ -218,7 +257,7 @@ const InvoiceGenerator = () => {
           <h3 className="title">- Cash Receipt -</h3>
         </div>
 
-        <form >
+        <form>
           <div className="gap-btw">
             <div>
               <h3 className="invoice-subheading">Invoice No. </h3>
@@ -238,7 +277,8 @@ const InvoiceGenerator = () => {
             onChange={(e) => setName(e.target.value)}
             required
             autoFocus
-            autoComplete="off" 
+            autoComplete="off"
+            maxLength={30}
           />
           <h3 className=" invoice-subheading" htmlFor="amount">
             Amount:
@@ -248,8 +288,9 @@ const InvoiceGenerator = () => {
             type="number"
             id="amount"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => setAmount(e.target.value.substring(0, 8))}
             required
+            maxLength={10}
           />
 
           <div className="payment-type-container">
@@ -301,10 +342,11 @@ const InvoiceGenerator = () => {
                   <input
                     id="additional-input"
                     className="radio-input-field"
-                    type="text"
+                    type="number"
                     value={additionalFieldText}
                     onChange={handleAdditionalFieldChange}
-                    autoComplete="off" 
+                    autoComplete="off"
+                    maxLength={10}
                   />
                 </div>
 
@@ -353,7 +395,6 @@ const InvoiceGenerator = () => {
             className="generate-pdf-button"
             type="button"
             onClick={handleDownloadPDF}
-            
           >
             Generate PDF
           </button>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import numWords from "num-words";
 import "./Entries.css";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import html2pdf from "html2pdf.js";
 import PDFContent from "./PdfContent";
 import ReactDOM from "react-dom";
+
 
 
 function Entries() {
@@ -43,32 +43,31 @@ function Entries() {
     }
   };
 
-  const convertAmountToWords = (amount) => {
-    const numericAmount = parseFloat(amount);
-    if (!isNaN(numericAmount)) {
-      return numWords(numericAmount).toUpperCase();
-    }
-    return "";
-  };
 
   const currentDate = new Date();
   const numericDate = currentDate.toLocaleDateString("en-US"); 
-
+ 
   const generatePDF = async (personData) => {
     const container = document.createElement("div");
-    // document.body.appendChild(container); // Append the container to the body
   
-    const { billNo, name, amount, payment_type, additional_field, dd_date, cheque_date } = personData;
+    const { billNo, name, amount, payment_type, additional_field, dd_date, cheque_date,amount_to_words } = personData;
+    const dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+  
+    const chequeDateFormatted = cheque_date ? new Date(cheque_date).toLocaleString("en-US", dateOptions) : "N/A";
+    const ddDateFormatted = dd_date ? new Date(dd_date).toLocaleString("en-US", dateOptions) : "N/A";
+
   
     ReactDOM.render(
       <PDFContent
-        billNo={billNo}
-        name={name}
-        amount={amount}
-        selectedPaymentType={payment_type}
-        additionalFieldText={additional_field}
+        billNo={personData.billNo}
+        name={personData.name}
+        amount={personData.amount}
+        selectedPaymentType={personData.payment_type}
+        additionalFieldText={personData.additional_field}
         numericDate={numericDate}
-        convertAmountToWords={convertAmountToWords}
+        convertAmountToWords={personData.amount_to_words} 
+        chequeDate={chequeDateFormatted}
+        dDate={ddDateFormatted}
       />,
       container
     );
@@ -77,7 +76,7 @@ function Entries() {
       margin: 0,
       filename: `Invoice${name}${billNo}`,
       image: { type: "jpeg", quality: 1 },
-      html2canvas: { scale: 2 },
+      html2canvas: { scale: 5 },
       jsPDF: { unit: "mm", format: "a5", orientation: "landscape" },
     };
   
